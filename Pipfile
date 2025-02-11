@@ -4,8 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+torch = "~=2.1.0" 
+numpy = "*"
+keras = "~=3.0"
+matplotlib = "*"
+scipy = "*"
 
 [dev-packages]
+ipykernel = "*"
+jupyter = "*"
 
 [requires]
 python_version = "3.11"
