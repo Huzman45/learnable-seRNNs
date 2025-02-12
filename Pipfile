@@ -5,10 +5,13 @@ name = "pypi"
 
 [packages]
 torch = "~=2.1.0" 
-numpy = "*"
 keras = "~=3.0"
 matplotlib = "*"
 scipy = "*"
+pandas = "*"
+numpy = "<2.0"
+tensorflow = "~=2.16.1" 
+bctpy = "0.6.1"
 
 [dev-packages]
 ipykernel = "*"
