@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "bde37512b6b60d6f1d7b93b3b5a6eca0fda4c2161313c1b1f82709c7594d1187"
+            "sha256": "413afaa61f3eb07e873ceb52fe75299eb09310bd36c54942b7ac86580fd3d332"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -145,6 +145,14 @@
             "markers": "python_version >= '3.7'",
             "version": "==3.4.1"
         },
+        "cloudpickle": {
+            "hashes": [
+                "sha256:b216fa8ae4019d5482a8ac3c95d8f6346115d8835911fd4aefd1a445e4242c64",
+                "sha256:c8c5a44295039331ee9dad40ba100a9c7297b6f988e50e87ccdf3765a668350e"
+            ],
+            "markers": "python_version >= '3.8'",
+            "version": "==3.1.1"
+        },
         "contourpy": {
             "hashes": [
                 "sha256:041b640d4ec01922083645a94bb3b2e777e6b626788f4095cf21abbe266413c1",
@@ -212,6 +220,13 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==0.12.1"
+        },
+        "farama-notifications": {
+            "hashes": [
+                "sha256:13fceff2d14314cf80703c8266462ebf3733c7d165336eee998fc58e545efd18",
+                "sha256:14de931035a41961f7c056361dc7f980762a143d05791ef5794a751a2caf05ae"
+            ],
+            "version": "==0.0.4"
         },
         "filelock": {
             "hashes": [
@@ -368,6 +383,14 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==1.70.0"
+        },
+        "gymnasium": {
+            "hashes": [
+                "sha256:1a532752efcb7590478b1cc7aa04f608eb7a2fdad5570cd217b66b6a35274bb1",
+                "sha256:61c3384b5575985bb7f85e43213bcb40f36fcdff388cae6bc229304c71f2843e"
+            ],
+            "markers": "python_version >= '3.8'",
+            "version": "==0.29.1"
         },
         "h5py": {
             "hashes": [
@@ -679,6 +702,15 @@
             ],
             "markers": "python_version >= '3.10'",
             "version": "==3.4.2"
+        },
+        "neurogym": {
+            "hashes": [
+                "sha256:0441225ad7ab6bfc129729d3d9fb677542246aac56347bedfa859e558591de63",
+                "sha256:726b51a1dd919041fb2108a7cfbab66e156d1427e45b9ddff415a8046c23b539"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.10'",
+            "version": "==1.0.8"
         },
         "numpy": {
             "hashes": [
@@ -1077,6 +1109,14 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'",
             "version": "==1.17.0"
+        },
+        "stable-baselines3": {
+            "hashes": [
+                "sha256:3bbf0e46b9aa4b1fd2696ff4c806ddb8ba719966ef0f71fba61f7a177e563c81",
+                "sha256:f74cde94a15c1d9d90343e73d790e1898b4c1cbb3f09eeeb580303d33f3fc4d6"
+            ],
+            "markers": "python_version >= '3.8'",
+            "version": "==2.4.1"
         },
         "sympy": {
             "hashes": [
