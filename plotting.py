@@ -1,4 +1,5 @@
 import pickle
+import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -35,13 +36,23 @@ def plot_histories(
     plt.xlabel("Epochs")
     plt.ylabel(title)
     plt.legend()
-    plt.show()
+    plt.savefig(f"plots/{title}.png")
 
 
 if __name__ == "__main__":
     history_path = "data/history.pickle"
     history = load_history(history_path)
-    plot_histories([history], ["RNN"], "accuracy", "Accuracy")
-    plot_histories([history], ["RNN"], "loss", "Loss")
-    plot_histories([history], ["RNN"], "val_accuracy", "Validation Accuracy")
-    plot_histories([history], ["RNN"], "val_loss", "Validation Loss")
+
+    history_2 = history.copy()
+    for key in history:
+        history_2[key] = [
+            (mean + np.random.random() - 0.5, std + np.random.random() - 0.5)
+            for mean, std in history[key]
+        ]
+
+    plot_histories([history, history_2], ["RNN", "Rand"], "accuracy", "Accuracy")
+    plot_histories([history, history_2], ["RNN", "Rand"], "loss", "Loss")
+    plot_histories(
+        [history, history_2], ["RNN", "Rand"], "val_accuracy", "Validation Accuracy"
+    )
+    plot_histories([history, history_2], ["RNN", "Rand"], "val_loss", "Validation Loss")
