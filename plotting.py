@@ -178,7 +178,7 @@ if __name__ == "__main__":
     argparser.add_argument(
         "--dirs",
         type=list[str],
-        default=["seRNNs/"],
+        default=["seRNNs"],
         help="Subdirectories within /data to load the nets from",
     )
 
@@ -211,14 +211,14 @@ if __name__ == "__main__":
     plot_local_statistics(local_stats, args.dirs, "matching")
 
     # Plot global statistics
-    plot_global_statistics(local_stats, args.dirs, "total_weight")
-    plot_global_statistics(local_stats, args.dirs,
+    plot_global_statistics(global_stats, args.dirs, "total_weight")
+    plot_global_statistics(global_stats, args.dirs,
                            "total_weighted_edge_length")
-    plot_global_statistics(local_stats, args.dirs, "global_efficiency")
-    plot_global_statistics(local_stats, args.dirs, "homophily_per_weight")
-    plot_global_statistics(local_stats, args.dirs, "modularity")
-    plot_global_statistics(local_stats, args.dirs, "efficiency_per_weight")
-    plot_global_statistics(local_stats, args.dirs, "corr_weight_distance")
+    plot_global_statistics(global_stats, args.dirs, "global_efficiency")
+    plot_global_statistics(global_stats, args.dirs, "homophily_per_weight")
+    plot_global_statistics(global_stats, args.dirs, "modularity")
+    plot_global_statistics(global_stats, args.dirs, "efficiency_per_weight")
+    plot_global_statistics(global_stats, args.dirs, "corr_weight_distance")
 
     # Visualise networks
 
