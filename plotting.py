@@ -1,7 +1,5 @@
 import argparse
 import os
-import pickle
-import bct
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -148,7 +146,7 @@ def visualise_network(
     ax.set_xlabel("X")
     ax.set_ylabel("Y")
     ax.set_zlabel("Z")
-    epoch_str = f"epoch_" + str(epoch if epoch != -
+    epoch_str = "epoch_" + str(epoch if epoch != -
                                 1 else len(net["coordinates"]) - 1)
     ax.set_title(f"{name}@{epoch_str}")
     plt.legend()
@@ -166,7 +164,7 @@ def visualise_weight_matrix(
     im = ax.imshow(weight_matrix, cmap="berlin", interpolation="nearest")
     ax.set_xlabel("Node")
     ax.set_ylabel("Node")
-    epoch_str = f"epoch_" + str(epoch if epoch != -
+    epoch_str = "epoch_" + str(epoch if epoch != -
                                 1 else len(net["coordinates"]) - 1)
     ax.set_title(f"Weight matrix of {name}@{epoch_str}")
     plt.colorbar(im, ax=ax)
