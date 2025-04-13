@@ -1,16 +1,14 @@
 import os
 import keras
-import numpy as np
 import tensorflow as tf
 import regularizers
 import pickle
 
 
 def train(
-    regularizer,
+    regus: list,
     train_data: tf.data.Dataset,
     test_data: tf.data.Dataset,
-    num_reg_strengths=50,
     epochs=10,
     batch_size=32,
     verbose=1,
@@ -19,20 +17,18 @@ def train(
     Train the model with the given regularizer.
 
     Args:
-        regularizer: The regularizer to use.
-        data: The training data.
-        num_reg_strengths: The number of regularization strengths to use.
-        reps_per_strength: The number of repetitions for each regularization strength.
-        epochs: The number of epochs to train for.
-        batch_size: The batch size to use.
-        verbose: Verbosity mode (0 = silent, 1 = progress bar, 2 = one line per epoch).
+        regularizers: List of regularizers to use.
+        train_data: Training data.
+        test_data: Testing data.
+        epochs: Number of epochs to train for.
+        batch_size: Batch size for training.
+        verbose: Verbosity mode (0, 1, or 2).
     """
     example_data = next(iter(train_data))
 
     histories = []
-    for strength in np.linspace(0, 1, num_reg_strengths):
+    for regu in regus:
         keras.backend.clear_session()
-        regu = regularizer(strength)
 
         # Assemble network
         tf_model = keras.models.Sequential(
@@ -69,7 +65,7 @@ def train(
     return histories
 
 
-def save_histories(histories, network_name):
+def save_histories(histories, path):
     """
     Save the training histories to a file.
 
@@ -77,6 +73,9 @@ def save_histories(histories, network_name):
         histories: The training histories to save.
         filename: The filename to save to.
     """
-    filename = os.path.join("data", network_name, "history.pickle")
+    path = os.path.join("data", path)
+    os.makedirs(path, exist_ok=True)
+    filename = os.path.join(path, "history.pickle")
+    
     with open(filename, "wb") as file:
         pickle.dump(histories, file)

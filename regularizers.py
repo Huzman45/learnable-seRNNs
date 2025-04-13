@@ -4,35 +4,15 @@ from mpl_toolkits.mplot3d import Axes3D
 import scipy.spatial
 import tensorflow as tf
 
-from keras import Regularizer
-from keras import backend
-from keras import callbacks
 from tensorflow.python.keras import backend
+from keras import Regularizer
+from keras import callbacks
 
 
-class SE1(Regularizer):
-    """A regulariser for sptially embedded RNNs.
-    Applies L1 regularisation to recurrent kernel of
-    RNN which is weighted by the distance of units
-    in predefined 3D space.
-    Calculation:
-        se1 * sum[distance_matrix o recurrent_kernel]
-    Attributes:
-        se1: Float; Weighting of SE1 regularisation term.
-        distance_tensor: TF tensor / matrix with cost per
-        connection in weight matrix of network.
-    """
-
-    def __init__(self, se1=0.01, neuron_num=100, network_structure=(5, 5, 4), coordinates_list=None, distance_power=1, distance_metric='euclidean'):
+class SpacialEmbedding:
+    def __init__(self, neuron_num=100, network_structure=(5, 5, 4), coordinates_list=None, distance_power=1, distance_metric='euclidean'):
         self.version = 'v1.1.0'
         self.distance_power = distance_power
-
-        # Set SE1 regularisation strength to default of 0.01 if no value given
-        se1 = 0.01 if se1 is None else se1
-        self._check_penalty_number(se1)
-
-        # Transform regularisation strength to TF's standard float format
-        self.se1 = backend.cast_to_floatx(se1)
 
         # Set up tensor with distance matrix
         # Set up neurons per dimension
@@ -45,7 +25,7 @@ class SE1(Regularizer):
         self.coordinates = [x.ravel(), y.ravel(), z.ravel()]
 
         # Override coordinate grid if one if provided in init
-        if coordinates_list != None:
+        if coordinates_list is not None:
             self.coordinates = coordinates_list
 
         # Check neuron number / number of coordinates
@@ -70,25 +50,6 @@ class SE1(Regularizer):
         # Create tensor from distance matrix
         self.distance_tensor = tf.convert_to_tensor(self.distance_matrix)
 
-    def __call__(self, x):
-        # Add calculation of loss here.
-        # L1 for reference: self.l1 * math_ops.reduce_sum(math_ops.abs(x))
-        abs_weight_matrix = tf.math.abs(x)
-
-        # se1_loss = self.se1 * tf.math.multiply(abs_weight_matrix, self.distance_tensor)
-        # se1_loss = tf.math.reduce_sum(abs_weight_matrix)
-        se1_loss = self.se1 * \
-            tf.math.reduce_sum(tf.math.multiply(
-                abs_weight_matrix, self.distance_tensor))
-
-        return se1_loss
-
-    def _check_penalty_number(self, x):
-        """check penalty number availability, raise ValueError if failed."""
-        if not isinstance(x, (float, int)):
-            raise ValueError(('Value: {} is not a valid regularization penalty number, '
-                              'expected an int or float value').format(x))
-
     def visualise_distance_matrix(self):
         plt.imshow(self.distance_matrix)
         plt.colorbar()
@@ -104,8 +65,58 @@ class SE1(Regularizer):
         ax.set_zlabel('z')
         plt.show()
 
+
+class L1(Regularizer):
+    def __init__(self, reg_factor=0.01, se:SpacialEmbedding=SpacialEmbedding()):
+        self._check_penalty_number(reg_factor)
+
+        # Transform regularisation strength to TF's standard float format
+        self.reg_factor = backend.cast_to_floatx(reg_factor)
+
+        self.se = se
+
+    def __call__(self, x):
+        # Add calculation of loss here.
+        # L1 for reference: self.l1 * math_ops.reduce_sum(math_ops.abs(x))
+        l1_loss = self.reg_factor * tf.math.reduce_sum(tf.math.abs(x))
+
+        return l1_loss
+
+    def _check_penalty_number(self, x):
+        """check penalty number availability, raise ValueError if failed."""
+        if not isinstance(x, (float, int)):
+            raise ValueError(('Value: {} is not a valid regularization penalty number, '
+                              'expected an int or float value').format(x))
+
     def get_config(self):
-        return {'se1': float(self.se1)}
+        return {'regularization factor': float(self.reg_factor)}
+
+
+class SE1(L1):
+    """A regulariser for sptially embedded RNNs.
+    Applies L1 regularisation to recurrent kernel of
+    RNN which is weighted by the distance of units
+    in predefined 3D space.
+    Calculation:
+        se1 * sum[distance_matrix o recurrent_kernel]
+    Attributes:
+        se1: Float; Weighting of SE1 regularisation term.
+        distance_tensor: TF tensor / matrix with cost per
+        connection in weight matrix of network.
+    """
+
+    def __call__(self, x):
+        # Add calculation of loss here.
+        # L1 for reference: self.l1 * math_ops.reduce_sum(math_ops.abs(x))
+        abs_weight_matrix = tf.math.abs(x)
+
+        # se1_loss = self.se1 * tf.math.multiply(abs_weight_matrix, self.distance_tensor)
+        # se1_loss = tf.math.reduce_sum(abs_weight_matrix)
+        se1_loss = self.reg_factor * \
+            tf.math.reduce_sum(tf.math.multiply(
+                abs_weight_matrix, self.se.distance_tensor))
+
+        return se1_loss
 
 
 class SE1_sWc(SE1):
@@ -116,9 +127,8 @@ class SE1_sWc(SE1):
     Crofts, J. J., & Higham, D. J. (2009). A weighted communicability measure applied to complex brain networks. Journal of the Royal Society Interface, 6(33), 411-414.
     '''
 
-    def __init__(self, se1=0.01, comms_factor=1, neuron_num=100, network_structure=(5, 5, 4), coordinates_list=None, distance_power=1, distance_metric='euclidean'):
-        SE1.__init__(self, se1, neuron_num, network_structure,
-                     coordinates_list, distance_power, distance_metric)
+    def __init__(self, reg_factor=0.01, comms_factor=1, se:SpacialEmbedding=SpacialEmbedding()):
+        SE1.__init__(self, reg_factor, se)
         self.comms_factor = comms_factor
 
     def __call__(self, x):
@@ -137,9 +147,9 @@ class SE1_sWc(SE1):
         comms_weight_matrix = tf.math.multiply(abs_weight_matrix, comms_matrix)
 
         # Multiply comms weights matrix with distance tensor, scale the mean, and return as loss
-        se1_loss = self.se1 * \
+        se1_loss = self.reg_factor * \
             tf.math.reduce_sum(tf.math.multiply(
-                comms_weight_matrix, self.distance_tensor))
+                comms_weight_matrix, self.se.distance_tensor))
 
         return se1_loss
 
@@ -167,7 +177,7 @@ class RNNHistoryI(callbacks.Callback):
         self.model.history.history['weight_matrix'].append(
             self.model.layers[self.RNN_layer_number].get_weights()[1])
         self.model.history.history['coordinates'].append(
-            self.model.layers[self.RNN_layer_number].recurrent_regularizer.coordinates)
+            self.model.layers[self.RNN_layer_number].recurrent_regularizer.se.coordinates)
         # print("Saved RNN_Weight_Matrix to history.")
 
     def on_epoch_end(self, epoch, logs=None):
@@ -175,5 +185,5 @@ class RNNHistoryI(callbacks.Callback):
         self.model.history.history['weight_matrix'].append(
             self.model.layers[self.RNN_layer_number].get_weights()[1])
         self.model.history.history['coordinates'].append(
-            self.model.layers[self.RNN_layer_number].recurrent_regularizer.coordinates)
+            self.model.layers[self.RNN_layer_number].recurrent_regularizer.se.coordinates)
         # print("Saved RNN_Weight_Matrix to history.")
