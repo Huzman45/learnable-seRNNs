@@ -2,7 +2,6 @@ import argparse
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 import utils
 
@@ -150,6 +149,7 @@ def visualise_network(
                                 1 else len(net["coordinates"]) - 1)
     ax.set_title(f"{name}@{epoch_str}")
     plt.legend()
+    os.makedirs(f"plots/visualisations/{name}", exist_ok=True)
     plt.savefig(f"plots/visualisations/{name}/{epoch_str}.png")
 
 
@@ -168,6 +168,7 @@ def visualise_weight_matrix(
                                 1 else len(net["coordinates"]) - 1)
     ax.set_title(f"Weight matrix of {name}@{epoch_str}")
     plt.colorbar(im, ax=ax)
+    os.makedirs(f"plots/visualisations/{name}", exist_ok=True)
     plt.savefig(f"plots/visualisations/{name}/weight_matrix@{epoch_str}.png")
 
 
@@ -175,7 +176,7 @@ if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
     argparser.add_argument(
         "--dirs",
-        type=list[str],
+        nargs="+",
         default=["seRNNs"],
         help="Subdirectories within /data to load the nets from",
     )
@@ -220,7 +221,18 @@ if __name__ == "__main__":
 
     # Visualise networks
 
-    # visualise_network(history[0], f"seRNN", epoch=4)
-    # visualise_weight_matrix(
-    #     history[0], f"seRNN", epoch=4
-    # )
+    for net_name, history in zip(args.dirs, histories):
+        epochs = len(history[0]["weight_matrix"])
+        regularization_strength = len(history)//2/len(history) 
+        for epoch in [0, epochs//2, epochs - 1]:
+            visualise_network(
+                history[len(history)//2],
+                f"{net_name}@regstrength_{regularization_strength:.2f}",
+                epoch=epoch,
+                threshold=0.05,
+            )
+            visualise_weight_matrix(
+                history[len(history)//2],
+                f"{net_name}@regstrength_{regularization_strength:.2f}",
+                epoch=epoch,
+            )
