@@ -11,7 +11,7 @@ import utils
 
 default_font_size = {"title": 14, "label": 11, "legend": 10}
 style = "seaborn-v0_8-paper"
-file_format = "pdf"
+file_format = "png"
 dpi = 300
 figsize: tuple = ((8, 6),)
 
